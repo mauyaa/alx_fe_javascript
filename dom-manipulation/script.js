@@ -33,15 +33,6 @@ function showRandomQuote(filteredQuotes = quotes) {
   quoteDisplay.innerText = `"${quote.text}" - ${quote.category}`;
 }
 
-// Event listener for "Show New Quote"
-document.getElementById("newQuote").addEventListener("click", () => {
-  const selectedCategory = document.getElementById("categoryFilter").value;
-  const filtered = selectedCategory === "all"
-    ? quotes
-    : quotes.filter(q => q.category === selectedCategory);
-  showRandomQuote(filtered);
-});
-
 // ======================
 // ADD NEW QUOTE
 // ======================
@@ -59,6 +50,18 @@ function addQuote() {
 
   textInput.value = '';
   categoryInput.value = '';
+}
+
+// Optional: createAddQuoteForm function if you want a dynamic form
+function createAddQuoteForm(containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button id="addQuoteBtn">Add Quote</button>
+  `;
+
+  document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
 }
 
 // ======================
@@ -83,12 +86,25 @@ function filterQuotes() {
   showRandomQuote(filtered);
 }
 
-// Restore last selected category
+// ======================
+// EVENT LISTENERS
+// ======================
 document.addEventListener("DOMContentLoaded", () => {
+  createAddQuoteForm("addQuoteContainer"); // dynamically create the add quote form
   populateCategories();
   const lastCategory = localStorage.getItem("lastCategory") || "all";
   document.getElementById("categoryFilter").value = lastCategory;
   filterQuotes();
+
+  document.getElementById("newQuote").addEventListener("click", () => {
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    const filtered = selectedCategory === "all"
+      ? quotes
+      : quotes.filter(q => q.category === selectedCategory);
+    showRandomQuote(filtered);
+  });
+
+  document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
 });
 
 // ======================
