@@ -23,18 +23,22 @@ function saveQuotes() {
 // DOM MANIPULATION
 // ======================
 function showRandomQuote(filteredQuotes = quotes) {
+  const quoteDisplay = document.getElementById("quoteDisplay");
   if (filteredQuotes.length === 0) {
-    document.getElementById("quoteDisplay").innerText = "No quotes to display.";
+    quoteDisplay.innerText = "No quotes to display.";
     return;
   }
   const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
   const quote = filteredQuotes[randomIndex];
-  document.getElementById("quoteDisplay").innerText = `"${quote.text}" - ${quote.category}`;
+  quoteDisplay.innerText = `"${quote.text}" - ${quote.category}`;
 }
 
+// Event listener for "Show New Quote"
 document.getElementById("newQuote").addEventListener("click", () => {
   const selectedCategory = document.getElementById("categoryFilter").value;
-  const filtered = selectedCategory === "all" ? quotes : quotes.filter(q => q.category === selectedCategory);
+  const filtered = selectedCategory === "all"
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
   showRandomQuote(filtered);
 });
 
@@ -42,16 +46,19 @@ document.getElementById("newQuote").addEventListener("click", () => {
 // ADD NEW QUOTE
 // ======================
 function addQuote() {
-  const text = document.getElementById("newQuoteText").value.trim();
-  const category = document.getElementById("newQuoteCategory").value.trim();
+  const textInput = document.getElementById("newQuoteText");
+  const categoryInput = document.getElementById("newQuoteCategory");
+  const text = textInput.value.trim();
+  const category = categoryInput.value.trim();
+
   if (!text || !category) return alert("Both fields are required!");
 
   quotes.push({ text, category });
   saveQuotes();
   filterQuotes(); // Show filtered result if applicable
 
-  document.getElementById("newQuoteText").value = '';
-  document.getElementById("newQuoteCategory").value = '';
+  textInput.value = '';
+  categoryInput.value = '';
 }
 
 // ======================
@@ -78,9 +85,9 @@ function filterQuotes() {
 
 // Restore last selected category
 document.addEventListener("DOMContentLoaded", () => {
-  const last = localStorage.getItem("lastCategory") || "all";
-  document.getElementById("categoryFilter").value = last;
   populateCategories();
+  const lastCategory = localStorage.getItem("lastCategory") || "all";
+  document.getElementById("categoryFilter").value = lastCategory;
   filterQuotes();
 });
 
@@ -104,10 +111,10 @@ function importFromJsonFile(event) {
       const importedQuotes = JSON.parse(e.target.result);
       quotes.push(...importedQuotes);
       saveQuotes();
-      alert('Quotes imported successfully!');
+      alert("Quotes imported successfully!");
       filterQuotes();
     } catch (err) {
-      alert('Invalid JSON file!');
+      alert("Invalid JSON file!");
     }
   };
   fileReader.readAsText(event.target.files[0]);
@@ -120,9 +127,7 @@ async function syncWithServer() {
   try {
     const res = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
     const serverData = await res.json();
-    // Map server data to our format
     const serverQuotes = serverData.map(q => ({ text: q.title, category: "Server" }));
-    // Merge server quotes, avoid duplicates
     serverQuotes.forEach(sq => {
       if (!quotes.some(q => q.text === sq.text && q.category === sq.category)) quotes.push(sq);
     });
