@@ -1,16 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dynamic Quote Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Quote Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #quoteDisplay { margin: 20px 0; padding: 15px; border: 1px solid #ddd; min-height: 100px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        .form-group { margin: 10px 0; }
+        input[type="text"], select { padding: 8px; width: 100%; max-width: 300px; }
+        .notification { padding: 10px; margin: 10px 0; background: #f0f0f0; border-left: 4px solid #3498db; }
+    </style>
 </head>
 <body>
-  <h1>Dynamic Quote Generator</h1>
+    <h1>Dynamic Quote Generator</h1>
+    
+    <div id="notification" class="notification" style="display:none;"></div>
+    
+    <div id="quoteDisplay"></div>
+    <button id="newQuote">Show New Quote</button>
+    
+    <div class="form-group">
+        <select id="categoryFilter">
+            <option value="all">All Categories</option>
+        </select>
+    </div>
+    
+    <h2>Add New Quote</h2>
+    <div class="form-group">
+        <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    </div>
+    <div class="form-group">
+        <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    </div>
+    <button onclick="addQuote()">Add Quote</button>
+    
+    <h2>Import/Export Quotes</h2>
+    <button onclick="exportToJson()">Export to JSON</button>
+    <div class="form-group">
+        <input type="file" id="importFile" accept=".json" />
+        <button onclick="importFromJson()">Import from JSON</button>
+    </div>
+    
+    <h2>Server Sync</h2>
+    <button id="syncButton">Sync with Server</button>
+    <div id="syncStatus"></div>
 
-  <div id="quoteDisplay"></div>
-  <button id="newQuote">Show New Quote</button>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
