@@ -182,6 +182,8 @@ function importFromJsonFile(event) {
     reader.readAsText(file);
 }
 
+// ... (previous code remains the same until server sync functions)
+
 // Server Sync Functions
 async function fetchQuotesFromServer() {
     try {
@@ -198,45 +200,86 @@ async function fetchQuotesFromServer() {
     }
 }
 
+async function postQuotesToServer() {
+    try {
+        // Prepare data to send
+        const quotesToSend = quotes.map(quote => ({
+            title: quote.text,
+            body: quote.category,
+            userId: 1  // Required by JSONPlaceholder
+        }));
+
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotesToSend)
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error posting quotes to server:', error);
+        return null;
+    }
+}
+
 async function syncQuotes() {
     try {
         syncStatus.textContent = 'Syncing with server...';
+        let conflictResolved = false;
         
+        // Step 1: Fetch quotes from server
         const serverQuotes = await fetchQuotesFromServer();
         
+        // Step 2: Send our quotes to server
+        const postResult = await postQuotesToServer();
+        
+        // Conflict resolution: server data takes precedence
         const mergedQuotes = [...quotes];
+        
         serverQuotes.forEach(serverQuote => {
-            const index = mergedQuotes.findIndex(q => 
+            const existingIndex = mergedQuotes.findIndex(q => 
                 q.text === serverQuote.text && q.category === serverQuote.category
             );
             
-            if (index === -1) {
+            if (existingIndex === -1) {
+                // New quote from server - add it
                 mergedQuotes.push(serverQuote);
             } else {
-                mergedQuotes[index] = serverQuote;
+                // Potential conflict - server data takes precedence
+                if (JSON.stringify(mergedQuotes[existingIndex]) !== JSON.stringify(serverQuote)) {
+                    conflictResolved = true;
+                    mergedQuotes[existingIndex] = serverQuote;
+                }
             }
         });
         
+        // Update local quotes
         quotes = mergedQuotes;
         saveQuotes();
         populateCategories();
         
+        // Update UI with sync results
         syncStatus.textContent = `Sync successful at ${new Date().toLocaleTimeString()}`;
-        showNotification('Data synced with server. ' + 
-                         serverQuotes.length + ' quotes processed.', 'success');
+        
+        if (conflictResolved) {
+            showNotification('Data synced. Conflicts resolved (server data used).', 'warning');
+        } else {
+            showNotification('Data synced successfully! ' + 
+                             serverQuotes.length + ' quotes processed.', 'success');
+        }
+        
+        // Show notification about server post
+        if (postResult) {
+            showNotification('Quotes sent to server successfully!', 'success');
+        }
+        
     } catch (error) {
         syncStatus.textContent = 'Sync failed';
         showNotification('Sync error: ' + error.message, 'error');
     }
 }
 
-// UI Helpers
-function showNotification(message, type) {
-    notification.textContent = message;
-    notification.style.display = 'block';
-    notification.style.borderLeftColor = type === 'error' ? '#e74c3c' : '#2ecc71';
-    
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 3000);
-}
+// ... (rest of the code remains the same)
