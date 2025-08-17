@@ -10,54 +10,23 @@
         button { padding: 8px 15px; margin: 5px; cursor: pointer; }
         .form-group { margin: 10px 0; }
         input[type="text"], select { padding: 8px; width: 100%; max-width: 300px; }
-        .notification { 
-            padding: 10px; 
-            margin: 10px 0; 
-            border-left: 4px solid #3498db; 
-            display: none;
-        }
-        .success { border-left-color: #2ecc71; }
-        .error { border-left-color: #e74c3c; }
-        .warning { border-left-color: #f39c12; }
-        .conflict { border-left-color: #9b59b6; }
-        #conflictResolution { 
-            background-color: #f9f9f9; 
-            padding: 15px; 
-            border: 1px solid #ddd; 
-            margin: 15px 0; 
-            display: none;
-        }
+        .notification { padding: 10px; margin: 10px 0; background: #f0f0f0; border-left: 4px solid #3498db; }
     </style>
 </head>
 <body>
     <h1>Dynamic Quote Generator</h1>
     
-    <!-- Notification System -->
-    <div id="notification" class="notification"></div>
-    <div id="conflictNotification" class="notification conflict"></div>
+    <div id="notification" class="notification" style="display:none;"></div>
     
-    <!-- Conflict Resolution UI -->
-    <div id="conflictResolution">
-        <h3>Conflict Detected!</h3>
-        <p>We found differences between your local quotes and server quotes. How would you like to resolve?</p>
-        <div id="conflictDetails"></div>
-        <button id="useServerBtn">Use Server Version</button>
-        <button id="keepLocalBtn">Keep Local Version</button>
-        <button id="keepBothBtn">Keep Both</button>
-    </div>
-    
-    <!-- Quote Display -->
     <div id="quoteDisplay"></div>
     <button id="newQuote">Show New Quote</button>
     
-    <!-- Category Filter -->
     <div class="form-group">
         <select id="categoryFilter">
             <option value="all">All Categories</option>
         </select>
     </div>
     
-    <!-- Add Quote Form -->
     <h2>Add New Quote</h2>
     <div class="form-group">
         <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
@@ -65,20 +34,18 @@
     <div class="form-group">
         <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
     </div>
-    <button id="addQuoteBtn">Add Quote</button>
+    <button onclick="addQuote()">Add Quote</button>
     
-    <!-- Import/Export -->
     <h2>Import/Export Quotes</h2>
-    <button id="exportBtn">Export to JSON</button>
+    <button onclick="exportToJson()">Export to JSON</button>
     <div class="form-group">
         <input type="file" id="importFile" accept=".json" />
-        <button id="importBtn">Import from JSON</button>
+        <button onclick="importFromJson()">Import from JSON</button>
     </div>
     
-    <!-- Server Sync -->
     <h2>Server Sync</h2>
     <button id="syncButton">Sync with Server</button>
-    <div id="syncStatus">Last sync: Never</div>
+    <div id="syncStatus"></div>
 
     <script src="script.js"></script>
 </body>
